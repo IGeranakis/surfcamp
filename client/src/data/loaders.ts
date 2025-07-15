@@ -1,55 +1,52 @@
-import qs from "qs"
+import qs from "qs";
 import { fetchAPI } from "@/utils/fetch-api";
 import { getStrapiURL } from "@/utils/get-strapi-url";
 
 const BASE_URL = getStrapiURL();
 
-const homePageQuery = qs.stringify(
-    {
+const homePageQuery = qs.stringify({
   populate: {
-      blocks:{
-          on: {
-            "blocks.hero-section": {
-                  populate: {
-                    image: {
-                        fields: ["url", "alternativeText"],
-                    },
-                    logo: {
-                        populate: {
-                            image: {
-                              fields: ["url", "alternativeText"],
-                            },
-                        },
-                    },
-                    cta: true,
-                  },
+    blocks: {
+      on: {
+        "blocks.hero-section": {
+          populate: {
+            image: {
+              fields: ["url", "alternativeText"],
             },
-            "blocks.info-block":{
-                populate: {
-                    image: {
-                      fields: ["url", "alternativeText"],
-                    },
-                    cta: true
+            logo: {
+              populate: {
+                image: {
+                  fields: ["url", "alternativeText"],
                 },
+              },
             },
+            cta: true,
           },
+        },
+        "blocks.info-block": {
+          populate: {
+            image: {
+              fields: ["url", "alternativeText"],
+            },
+            cta: true,
+          },
+        },
       },
+    },
   },
-},
-)
+});
 
-export async function getHomePage()
-{
-    const path = "/api/home-page";
-    
-    const url = new URL(path, BASE_URL);
-    url.search = homePageQuery;
+export async function getHomePage() {
+  const path = "/api/home-page";
 
-    return await fetchAPI(url.href, {method: "GET"})
+  const url = new URL(path, BASE_URL);
+  url.search = homePageQuery;
+
+  return await fetchAPI(url.href, { method: "GET" });
 }
 
-const pageBySlugQuery = (slug: string) => qs.stringify(
-  {
+const pageBySlugQuery = (slug: string) =>
+  qs.stringify({
     filters: {
       slug: {
         $eq: slug,
@@ -81,12 +78,21 @@ const pageBySlugQuery = (slug: string) => qs.stringify(
               cta: true,
             },
           },
+          "blocks.featured-article": {
+            populate: {
+              image: {
+                fields: ["url", "alternativeText"],
+              },
+              link: true,
+            },
+          },
+          "blocks.subscribe": {
+            populate: true,
+          },
         },
       },
     },
-  },
-);
-
+  });
 
 export async function getPageBySlug(slug: string) {
   const path = "/api/pages";
@@ -111,18 +117,18 @@ const globalSettingQuery = qs.stringify({
       },
     },
     footer: {
-  populate: {
-    logo: {
       populate: {
-        image: {
-          fields: ["url", "alternativeText"],
+        logo: {
+          populate: {
+            image: {
+              fields: ["url", "alternativeText"],
+            },
+          },
         },
+        navigation: true,
+        policies: true,
       },
     },
-    navigation: true,
-    policies: true,
-  },
-},
   },
 });
 
@@ -130,5 +136,20 @@ export async function getGlobalSettings() {
   const path = "/api/global";
   const url = new URL(path, BASE_URL);
   url.search = globalSettingQuery;
+  return fetchAPI(url.href, { method: "GET" });
+}
+
+export async function getContent(path: string) {
+  const url = new URL(path, BASE_URL);
+
+  url.search = qs.stringify({
+    sort: ["createdAt:desc"],
+    populate: {
+      image: {
+        fields: ["url", "alternativeText"],
+      },
+    },
+  });
+
   return fetchAPI(url.href, { method: "GET" });
 }

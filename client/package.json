@@ -16,7 +16,8 @@
     "react-dom": "^19.0.0",
     "react-markdown": "^10.1.0",
     "sass": "^1.89.2",
-    "yarn": "^1.22.22"
+    "yarn": "^1.22.22",
+    "zod": "^4.0.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
